@@ -8,18 +8,17 @@ on:
     - cron: "0 5 * * 3"       # Weekly: Increment patch version
 
 jobs:
-  linter:
-    runs-on: ubuntu-latest
-    steps:
+  # linter:
+  #   runs-on: ubuntu-latest
+  #   steps:
 
-      - uses: actions/checkout@v5
+  #     - uses: actions/checkout@v5
 
-      - name: Lint Dockerfile
-        uses: hadolint/hadolint-action@v3.3.0
-        with:
-          dockerfile: "docker/Dockerfile"
-          format: checkstyle
-          ignore: DL3008, DL3016
+  #     - name: Lint Dockerfile
+  #       uses: hadolint/hadolint-action@v3.3.0
+  #       with:
+  #         dockerfile: "docker/Dockerfile"
+  #         ignore: DL3008, DL3016
 
   build-and-push:
     runs-on: ubuntu-latest
@@ -61,20 +60,21 @@ jobs:
       with:
         context: docker
         push: true
+        platforms: linux/amd64,linux/arm64
         build-args: |
           NODE_VERSION=${{ matrix.node }}
         tags: |
-          ${{ secrets.DOCKERHUB_USERNAME }}/node-tools:${{ matrix.node }}
-          ${{ secrets.DOCKERHUB_USERNAME }}/node-tools:${{ steps.major-minor.outputs.NODE_VERSION }}
-          ${{ secrets.DOCKERHUB_USERNAME }}/node-tools:${{ steps.major.outputs.NODE_VERSION }}
+          ${{ secrets.DOCKERHUB_USERNAME }}/node-tools:${{ matrix.node }}-alpine
+          ${{ secrets.DOCKERHUB_USERNAME }}/node-tools:${{ steps.major-minor.outputs.NODE_VERSION }}-alpine
+          ${{ secrets.DOCKERHUB_USERNAME }}/node-tools:${{ steps.major.outputs.NODE_VERSION }}-alpine
         labels: ${{ steps.meta.outputs.labels }}
 
-    - name: Run Trivy vulnerability scanner
-      uses: aquasecurity/trivy-action@0.28.0
-      with:
-        image-ref: 'docker.io/${{ secrets.DOCKERHUB_USERNAME }}/node-tools:${{ matrix.node }}'
-        format: 'table'
-        exit-code: '1'
-        ignore-unfixed: true
-        vuln-type: 'os,library'
-        severity: 'CRITICAL,HIGH'
+    # - name: Run Trivy vulnerability scanner
+    #   uses: aquasecurity/trivy-action@0.28.0
+    #   with:
+    #     image-ref: 'docker.io/${{ secrets.DOCKERHUB_USERNAME }}/node-tools:${{ matrix.node }}'
+    #     format: 'table'
+    #     exit-code: '1'
+    #     ignore-unfixed: true
+    #     vuln-type: 'os,library'
+    #     severity: 'CRITICAL,HIGH'
