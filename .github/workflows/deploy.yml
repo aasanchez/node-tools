@@ -5,9 +5,6 @@ on:
     branches:
       - master
 
-env:
-  NODE_VERSION: 20
-
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
@@ -32,5 +29,5 @@ jobs:
         context: docker
         push: true
         build-args: |
-          NODE_VERSION=${{ env.NODE_VERSION }}
-        tags: ${{ secrets.DOCKERHUB_USERNAME }}/node-tools:${{ env.NODE_VERSION }}
+          NODE_VERSION=${{ matrix.node }}
+        tags: ${{ secrets.DOCKERHUB_USERNAME }}/node-tools:${{ matrix.node }}
