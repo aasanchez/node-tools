@@ -3,7 +3,7 @@ name: SAST
 on:
   workflow_dispatch:
   schedule:
-    - cron: "0 14 * * *"       # Weekly: Increment patch version
+    - cron: "0 14 * * *"
 
 jobs:
   linter:
