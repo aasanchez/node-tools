@@ -1,0 +1,36 @@
+name: Deploy to Docker Hub
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 14 * * *"       # Weekly: Increment patch version
+
+jobs:
+  linter:
+    runs-on: ubuntu-latest
+    steps:
+
+      - uses: actions/checkout@v5
+
+      - name: Lint Dockerfile
+        uses: hadolint/hadolint-action@v3.3.0
+        with:
+          dockerfile: "docker/Dockerfile"
+          ignore: DL3008, DL3016
+
+  build-and-push:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        node: [22.20.0, 24.8.0]
+    steps:
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          image-ref: 'docker.io/${{ secrets.DOCKERHUB_USERNAME }}/node-tools:${{ matrix.node }}-alpine'
+          format: 'table'
+          exit-code: '1'
+          ignore-unfixed: true
+          vuln-type: 'os,library'
+          severity: 'CRITICAL,HIGH'
