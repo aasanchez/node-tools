@@ -1,4 +1,4 @@
-name: Deploy to Docker Hub
+name: SAST
 
 on:
   workflow_dispatch:
@@ -18,7 +18,7 @@ jobs:
           dockerfile: "docker/Dockerfile"
           ignore: DL3008, DL3016
 
-  build-and-push:
+  security:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false

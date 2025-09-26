@@ -1,5 +1,4 @@
-name: Deploy to Docker Hub
-
+name: Build and push
 on:
   push:
     branches:
