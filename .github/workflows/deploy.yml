@@ -4,6 +4,8 @@ on:
   push:
     branches:
       - master
+  schedule:
+    - cron: "0 5 * * 3"       # Weekly: Increment patch version
 
 jobs:
   linter:
@@ -22,11 +24,23 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        node: [22, 24]
+        node: [22.20.0, 24.8.0]
 
     steps:
     - name: Checkout code
       uses: actions/checkout@v5
+
+    - name: Extract major.minor
+      id: major-minor
+      run: |
+        NODE_MAJORMINOR=$(echo "${{ matrix.node }}" | cut -d. -f1-2)
+        echo "NODE_MAJORMINOR=$NODE_MAJORMINOR" >> $GITHUB_OUTPUT
+
+    - name: Extract major
+      id: major
+      run: |
+        NODE_MAJOR=$(echo "${{ matrix.node }}" | cut -d. -f1)
+        echo "NODE_MAJOR=$NODE_MAJOR" >> $GITHUB_OUTPUT
 
     - name: Docker meta
       id: meta
@@ -47,7 +61,9 @@ jobs:
         push: true
         build-args: |
           NODE_VERSION=${{ matrix.node }}
-        tags: ${{ secrets.DOCKERHUB_USERNAME }}/node-tools:${{ matrix.node }}
+        tags: 
+          - ${{ secrets.DOCKERHUB_USERNAME }}/node-tools:${{ matrix.node }}
+          - ${{ secrets.DOCKERHUB_USERNAME }}/node-tools:${{ steps.major-minor.outputs.NODE_MAJORMINOR }}
         labels: ${{ steps.meta.outputs.labels }}
 
     - name: Run Trivy vulnerability scanner
