@@ -23,12 +23,14 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        node: [22.20.0, 24.8.0]
+        node: 
+          - 22.20.0-alpine
+          - 24.8.0-alpine
     steps:
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@0.28.0
         with:
-          image-ref: 'docker.io/${{ secrets.DOCKERHUB_USERNAME }}/node-tools:${{ matrix.node }}-alpine'
+          image-ref: 'docker.io/${{ secrets.DOCKERHUB_USERNAME }}/node-tools:${{ matrix.node }}'
           format: 'table'
           exit-code: '1'
           ignore-unfixed: true

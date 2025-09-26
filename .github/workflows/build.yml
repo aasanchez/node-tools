@@ -4,7 +4,7 @@ on:
     branches:
       - master
   schedule:
-    - cron: "0 5 * * 3"       # Weekly: Increment patch version
+    - cron: "0 5 * * 3"
 
 jobs:
   build-and-push:
@@ -12,8 +12,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        node: [22.20.0, 24.8.0]
-
+        node:
+          - 22.20.0-alpine
+          - 24.8.0-alpine
     steps:
     - name: Checkout code
       uses: actions/checkout@v5
@@ -57,7 +58,7 @@ jobs:
         build-args: |
           NODE_VERSION=${{ matrix.node }}
         tags: |
-          ${{ secrets.DOCKERHUB_USERNAME }}/node-tools:${{ matrix.node }}-alpine
-          ${{ secrets.DOCKERHUB_USERNAME }}/node-tools:${{ steps.major-minor.outputs.NODE_VERSION }}-alpine
-          ${{ secrets.DOCKERHUB_USERNAME }}/node-tools:${{ steps.major.outputs.NODE_VERSION }}-alpine
+          ${{ secrets.DOCKERHUB_USERNAME }}/node-tools:${{ matrix.node }}
+          ${{ secrets.DOCKERHUB_USERNAME }}/node-tools:${{ steps.major-minor.outputs.NODE_VERSION }}
+          ${{ secrets.DOCKERHUB_USERNAME }}/node-tools:${{ steps.major.outputs.NODE_VERSION }}
         labels: ${{ steps.meta.outputs.labels }}
